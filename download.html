@@ -3,34 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tải ứng dụng Tour App</title>
+    <title>Khu phố Ẩm thực Vĩnh Khánh</title>
     <style>
         body { font-family: sans-serif; text-align: center; padding: 50px 20px; background: #E1F5EE; color: #0F6E56;}
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #1D9E75; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Thêm style cho nút bấm cứu hộ */
+        .btn-download { display: inline-block; margin-top: 20px; padding: 12px 24px; background: #1D9E75; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;}
+        .btn-download:active { background: #157959; }
     </style>
 </head>
 <body>
-    <h2>Đang kiểm tra ứng dụng...</h2>
-    <div class="loader"></div>
-    <p>Nếu ứng dụng không tự động mở, hệ thống sẽ tự động tải file cài đặt về máy.</p>
+    <h2>Chào mừng đến với Khu phố Ẩm thực Vĩnh Khánh!</h2>
+    <p>Đang kết nối bạn với hệ thống Hướng dẫn viên ảo...</p>
+    
+    <div class="loader" id="loading-spinner"></div>
+    
+    <!-- Giao diện dự phòng hiện ra sau 2.5 giây -->
+    <div id="fallback-ui" style="display: none; margin-top: 30px;">
+        <p style="color: #E53935; font-weight: bold;">Hệ thống không thể tự động mở Ứng dụng.</p>
+        <p>Vui lòng cài đặt ứng dụng bằng cách nhấn vào nút bên dưới:</p>
+        <a href="https://www.dropbox.com/scl/fi/7iiedro2flr7ibkat1st1/com.companyname.multilingualaudiotravelapp.apk?rlkey=l3qjjrhg8f5ql9cbc0vhqvhvr&st=lpf4bn3u&dl=1" class="btn-download">TẢI APP VỀ MÁY</a>
+    </div>
 
     <script>
-        // 1. Link đánh thức App (Nếu khách đã cài sẵn)
         var appLink = "vktour://home"; 
-        
-        // 2. DÁN LINK GOOGLE DRIVE DIRECT CỦA BẠN VÀO ĐÂY
-        var downloadLink = "https://www.dropbox.com/scl/fi/6bu6ht4nfsvypchlv8fl2/com.companyname.multilingualaudiotravelapp.apk?rlkey=cfld691dyf42epa7qdu6xw7x4&st=xnqi549s&dl=1";
+        var downloadLink = "https://www.dropbox.com/scl/fi/6bu6ht4nfsvypchlv8fl2/com.companyname.multilingualaudiotravelapp.apk?rlkey=cfld691dyf42epa7qdu6xw7x4&st=1jlw5lhh&dl=1";
 
-        // 3. Hẹn giờ: Sau 2.5 giây nếu App không mở lên -> Tự động tải file từ Google Drive
+        // 1. Dùng Iframe tàng hình để đánh thức App (Tránh làm sập web)
+        var iframe = document.createElement("iframe");
+        iframe.style.border = "none";
+        iframe.style.width = "1px";
+        iframe.style.height = "1px";
+        iframe.src = appLink;
+        document.body.appendChild(iframe);
+
+        // 2. Hẹn giờ 2.5 giây: Nếu người dùng vẫn ở trang web (không mở được app)
         var fallbackTimer = setTimeout(function() {
+            // Ẩn vòng xoay
+            document.getElementById('loading-spinner').style.display = 'none';
+            // Hiện nút bấm thủ công
+            document.getElementById('fallback-ui').style.display = 'block';
+            // Cố gắng tự động gọi link tải
             window.location.href = downloadLink;
         }, 2500);
 
-        // 4. Lệnh kích hoạt App
-        window.location.href = appLink;
-
-        // Nếu App mở thành công, hủy đếm giờ tải file
+        // 3. Nếu App mở thành công, trang web bị mờ đi -> Hủy hẹn giờ ngay
         window.onblur = function() {
             clearTimeout(fallbackTimer);
         };
