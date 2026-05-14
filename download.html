@@ -3,55 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khu phố Ẩm thực Vĩnh Khánh</title>
+    <title>Tải ứng dụng Tour App</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px 20px; background: #E1F5EE; color: #0F6E56;}
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #1D9E75; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Thêm style cho nút bấm cứu hộ */
-        .btn-download { display: inline-block; margin-top: 20px; padding: 12px 24px; background: #1D9E75; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;}
-        .btn-download:active { background: #157959; }
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px 20px;
+            background: #E1F5EE;
+            color: #0F6E56;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1D9E75;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* Thêm class để ẩn phần tử khi cần */
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
-    <h2>Chào mừng đến với Khu phố Ẩm thực Vĩnh Khánh!</h2>
-    <p>Đang kết nối bạn với hệ thống Hướng dẫn viên ảo...</p>
-    
-    <div class="loader" id="loading-spinner"></div>
-    
-    <!-- Giao diện dự phòng hiện ra sau 2.5 giây -->
-    <div id="fallback-ui" style="display: none; margin-top: 30px;">
-        <p style="color: #E53935; font-weight: bold;">Hệ thống không thể tự động mở Ứng dụng.</p>
-        <p>Vui lòng cài đặt ứng dụng bằng cách nhấn vào nút bên dưới:</p>
-        <a href="https://www.dropbox.com/scl/fi/r984rn6frveu5mgphgyp4/com.companyname.multilingualaudiotravelapp.apk?rlkey=8gsj4ldhae65jo09674l6fsd6&st=yoe6ica1&dl=1" class="btn-download">TẢI APP VỀ MÁY</a>
-    </div>
+    <h2 id="statusText">Đang kiểm tra phần cứng thiết bị...</h2>
+    <div id="spinner" class="loader"></div>
+    <p id="subText">Vui lòng đợi trong giây lát.</p>
 
     <script>
-        var appLink = "vktour://home"; 
+        // 1. Giữ nguyên link của bạn
+        var appLink = "vktour://home";
         var downloadLink = "https://www.dropbox.com/scl/fi/r984rn6frveu5mgphgyp4/com.companyname.multilingualaudiotravelapp.apk?rlkey=8gsj4ldhae65jo09674l6fsd6&st=yoe6ica1&dl=1";
 
-        // 1. Dùng Iframe tàng hình để đánh thức App (Tránh làm sập web)
-        var iframe = document.createElement("iframe");
-        iframe.style.border = "none";
-        iframe.style.width = "1px";
-        iframe.style.height = "1px";
-        iframe.src = appLink;
-        document.body.appendChild(iframe);
+        // 2. Kịch bản của Giảng viên: Hẹn giờ 1.5 giây để giả vờ quét phần cứng
+        setTimeout(function () {
 
-        // 2. Hẹn giờ 2.5 giây: Nếu người dùng vẫn ở trang web (không mở được app)
-        var fallbackTimer = setTimeout(function() {
-            // Ẩn vòng xoay
-            document.getElementById('loading-spinner').style.display = 'none';
-            // Hiện nút bấm thủ công
-            document.getElementById('fallback-ui').style.display = 'block';
-            // Cố gắng tự động gọi link tải
-            window.location.href = downloadLink;
-        }, 2500);
+            // Hàm Random ra số 0 hoặc 1
+            let cauHinh = Math.floor(Math.random() * 2);
 
-        // 3. Nếu App mở thành công, trang web bị mờ đi -> Hủy hẹn giờ ngay
-        window.onblur = function() {
-            clearTimeout(fallbackTimer);
-        };
+            // Lấy các thẻ HTML để đổi chữ
+            let statusText = document.getElementById("statusText");
+            let spinner = document.getElementById("spinner");
+            let subText = document.getElementById("subText");
+
+            if (cauHinh === 1) {
+                // ==========================================
+                // TRƯỜNG HỢP 1 (MÁY MẠNH): CHO PHÉP TẢI APP
+                // ==========================================
+                statusText.innerHTML = "✅ Thiết bị tương thích tốt!";
+                statusText.style.color = "green";
+                spinner.classList.add("hidden"); // Tắt vòng xoay
+                subText.innerHTML = "Hệ thống đang mở App hoặc tự động tải file cài đặt...";
+
+                // Gọi lại đúng logic cũ của bạn: Kích hoạt Deep Link và Dropbox
+                var fallbackTimer = setTimeout(function () {
+                    window.location.href = downloadLink;
+                }, 2500);
+
+                window.location.href = appLink;
+
+                window.onblur = function () {
+                    clearTimeout(fallbackTimer);
+                };
+
+            } else {
+                // ==========================================
+                // TRƯỜNG HỢP 0 (MÁY YẾU): CHẶN KHÔNG CHO TẢI
+                // ==========================================
+                statusText.innerHTML = "❌ Rất tiếc! Cấu hình máy bạn quá yếu.";
+                statusText.style.color = "red";
+                spinner.classList.add("hidden"); // Tắt vòng xoay
+                subText.innerHTML = "Ứng dụng yêu cầu cấu hình cao để xử lý Audio và Bản đồ. Quá trình tải đã bị hủy.";
+                subText.style.color = "red";
+
+                // Không gọi hàm window.location.href nữa -> Đứng im tại trang này.
+            }
+
+        }, 1500); // 1500ms = 1.5 giây
     </script>
 </body>
 </html>
